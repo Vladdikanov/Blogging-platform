@@ -2,6 +2,10 @@ from rest_framework import serializers
 from .models import User
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from django.conf import settings
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -30,5 +34,38 @@ class LoginSerializer(serializers.Serializer):
 
         if not user.is_active:
             raise AuthenticationFailed('Пользователь не активен')
+
+        return user
+    
+class GoogleAuthSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate(self, data):
+        token = data.get('token')
+
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                token,
+                requests.Request(),
+                settings.GOOGLE_CLIENT_ID
+            )
+        except ValueError as e:
+            raise serializers.ValidationError(f'Неверный токен Google: {e}')
+
+        email = idinfo.get('email')
+        picture = idinfo.get('picture', '')
+
+        if not email:
+            raise serializers.ValidationError('Google не вернул email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = User.objects.create_user(
+                email=email,
+                password=None,
+                avatar_url=picture,
+                provider='google',
+            )
 
         return user

@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, GoogleAuthSerializer
 
 class RegisterView(APIView):
     def post(self, request):
@@ -17,6 +17,22 @@ class RegisterView(APIView):
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.validated_data
+
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+            })
+
+        return Response(serializer.errors, status=400)
+
+class GoogleAuthView(APIView):
+    def post(self, request):
+        serializer = GoogleAuthSerializer(data=request.data)
 
         if serializer.is_valid():
             user = serializer.validated_data
