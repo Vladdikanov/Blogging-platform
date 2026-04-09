@@ -3,9 +3,15 @@ services:
     container_name: blog_postgres
     image: postgres:15
     environment:
-      POSTGRES_DB: 
+      POSTGRES_DB: blog_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d blog_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     ports:
       - "5433:5432"
     volumes:
@@ -20,7 +26,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env
 
