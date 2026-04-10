@@ -39,7 +39,7 @@ urlpatterns = [
     path('posts/', include('posts.urls')),
 
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 
     # re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0)),
     # re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0)),
