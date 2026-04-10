@@ -16,9 +16,31 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import permissions
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+# from drf_yasg.views import get_schema_view
+# from drf_yasg import openapi
+from django.urls import re_path
+
+# schema_view = get_schema_view(
+#     openapi.Info(
+#         title="Blog API",
+#         default_version='v1',
+#         description="API для блог-платформы",
+#     ),
+#     public=True,
+#     permission_classes=[permissions.AllowAny],
+#     authentication_classes=[],
+# )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('users.urls')),
     path('posts/', include('posts.urls')),
+
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+
+    # re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0)),
+    # re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0)),
 ]

@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'django.contrib.sites',
-    'posts'
+    'posts',
+    'drf_spectacular',
+    # 'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -87,7 +89,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
@@ -101,6 +104,22 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Blogging Platform API',
+    'DESCRIPTION': 'API для управления постами, лайками и комментариями',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'SECURITY': [{'BearerAuth': []}],
+    'SECURITY_DEFINITIONS': {
+        'BearerAuth': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'JWT',
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
